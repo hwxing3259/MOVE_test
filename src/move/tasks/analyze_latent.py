@@ -146,6 +146,8 @@ def analyze_latent(config: MOVEConfig) -> None:
     reducer: TransformerMixin = hydra.utils.instantiate(task_config.reducer)
     embedding = reducer.fit_transform(latent_space)
 
+    np.savetxt('./MOVE_latent_space.txt', latent_space)
+
     mappings_path = interim_path / "mappings.json"
     if mappings_path.exists():
         mappings = io.load_mappings(mappings_path)
