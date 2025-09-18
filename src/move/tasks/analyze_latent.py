@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import torch
 from sklearn.base import TransformerMixin
-
+import pickle
 import move.visualization as viz
 from move.analysis.metrics import (
     calculate_accuracy,
@@ -146,7 +146,7 @@ def analyze_latent(config: MOVEConfig) -> None:
     reducer: TransformerMixin = hydra.utils.instantiate(task_config.reducer)
     embedding = reducer.fit_transform(latent_space)
 
-    np.savetxt('./MOVE_latent_space.txt', latent_space)
+    pd.DataFrame(latent_space, index=df_index).to_csv('./MOVE_latent.csv', set='\t')
 
     mappings_path = interim_path / "mappings.json"
     if mappings_path.exists():
@@ -220,6 +220,9 @@ def analyze_latent(config: MOVEConfig) -> None:
     for con, con_recon in zip(con_list, con_recons):
         cosine_sim = calculate_cosine_similarity(con, con_recon)
         scores.append(cosine_sim)
+
+    with open('pickled_recon.pkl', 'wb') as f:  # open a text file
+        pickle.dump(con_recons, f) # serialize the list
 
     logger.debug("Generating plot: reconstruction metrics")
 
